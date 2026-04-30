@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Escape Anatomy</title>
+
+<style>
+body{
+  margin:0;
+  background:black;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+
+/* دخان */
+#fog{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  opacity:0.3;
+  background:
+    radial-gradient(1000px 600px at 30% 30%, rgba(255,255,255,0.1), transparent),
+    radial-gradient(800px 500px at 70% 70%, rgba(255,255,255,0.08), transparent);
+  animation:fogMove 15s linear infinite;
+}
+@keyframes fogMove{
+  0%{transform:translateX(-5%);}
+  50%{transform:translateX(5%);}
+  100%{transform:translateX(-5%);}
+}
+
+/* البداية */
+#intro{
+  position:fixed;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+}
+
+#intro img{
+  width:260px;
+}
+
+#intro h1{
+  color:red;
+  animation:flicker 1s infinite;
+}
+@keyframes flicker{
+  0%{opacity:1;}
+  50%{opacity:0.3;}
+  100%{opacity:1;}
+}
+
+/* اللعبة */
+#game{display:none;margin-top:40px;}
+img{width:300px;}
+
+button{
+  padding:10px;
+  background:red;
+  color:white;
+  border:none;
+}
+
+input{padding:10px;margin:5px;}
+
+/* اهتزاز */
+@keyframes shake{
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  50%{transform:translateX(6px);}
+  75%{transform:translateX(-6px);}
+  100%{transform:translateX(0);}
+}
+
+/* توهج */
+.glow{
+  color:#00ff88;
+  text-shadow:0 0 15px #00ff88;
+}
+
+/* flash */
+#flash{
+  position:fixed;
+  inset:0;
+  background:white;
+  opacity:0;
+  pointer-events:none;
+}
+
+/* scare */
+#scare{
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:black;
+  z-index:999;
+}
+#scare img{width:400px;}
+
+</style>
+</head>
+
+<body>
+
+<div id="fog"></div>
+<div id="flash"></div>
+
+<div id="scare">
+  <img src="scare.jpg">
+</div>
+
+<div id="intro">
+  <img src="intro.jpg">
+  <h1>ESCAPE ANATOMY</h1>
+
+  <input id="team1" placeholder="Player 1">
+  <input id="team2" placeholder="Player 2">
+
+  <button onclick="start()">START</button>
+</div>
+
+<div id="game"></div>
+
+<!-- أصوات -->
+<audio id="heartbeat" src="heartbeat.mp3" loop autoplay></audio>
+<audio id="bg" src="bg.mp3" loop></audio>
+<audio id="error" src="error.mp3"></audio>
+<audio id="win" src="win.mp3"></audio>
+<audio id="scareSound" src="scare.mp3"></audio>
+
+<script>
+
+let stage=1;
+let startTime;
+
+function flash(){
+  let f=document.getElementById("flash");
+  f.style.opacity="1";
+  setTimeout(()=>{f.style.opacity="0";},150);
+}
+
+function shake(msg){
+  msg.style.animation="shake 0.3s";
+  setTimeout(()=>{msg.style.animation="";},300);
+}
+
+function start(){
+  startTime=new Date();
+
+  document.getElementById("heartbeat").pause();
+  document.getElementById("intro").style.display="none";
+  document.getElementById("game").style.display="block";
+
+  let bg=document.getElementById("bg");
+  bg.volume=0.3;
+  bg.play().catch(()=>{});
+
+  load1();
+}
+
+/* Station 1 */
+function load1(){
+game.innerHTML=`
+<h2>Station 1</h2>
+<p>Identify the highlighted structure</p>
+<img src="img1.jpg">
+<br><input id="n">
+<button onclick="c1()">Submit</button>
+<p id="msg"></p>
+`;
+}
+
+function c1(){
+let n=document.getElementById("n").value;
+let msg=document.getElementById("msg");
+
+if(n=="5"){
+flash();
+msg.classList.add("glow");
+msg.innerHTML="🔍 Where comfort meets the body <br>Password:<br><input id='p'><button onclick='next()'>Enter</button>";
+stage=1.5;
+}else{
+document.getElementById("error").play();
+shake(msg);
+msg.innerHTML="❌ Wrong";
+}
+}
+
+/* Station 2 */
+function load2(){
+game.innerHTML=`
+<h2>Station 2</h2>
+<p>Identify the highlighted structure</p>
+<img src="img2.jpg">
+<br><input id="n">
+<button onclick="c2()">Submit</button>
+<p id="msg"></p>
+`;
+}
+
+function c2(){
+let n=document.getElementById("n").value;
+let msg=document.getElementById("msg");
+
+if(n=="16"){
+msg.innerHTML="Processing...";
+
+setTimeout(()=>{
+document.getElementById("scare").style.display="flex";
+document.getElementById("scareSound").play();
+},300);
+
+setTimeout(()=>{
+document.getElementById("scare").style.display="none";
+flash();
+msg.classList.add("glow");
+msg.innerHTML="🔍 Where knowledge is written <br>Password:<br><input id='p'><button onclick='next()'>Enter</button>";
+},900);
+
+stage=2.5;
+
+}else{
+document.getElementById("error").play();
+shake(msg);
+msg.innerHTML="❌ Wrong";
+}
+}
+
+/* Station 3 */
+function load3(){
+game.innerHTML=`
+<h2>Station 3</h2>
+<p>Identify the highlighted structure</p>
+<img src="img3.jpg">
+<br><input id="n">
+<button onclick="c3()">Submit</button>
+<p id="msg"></p>
+`;
+}
+
+function c3(){
+let msg=document.getElementById("msg");
+
+if(n.value=="5"){
+flash();
+msg.classList.add("glow");
+msg.innerHTML="🔍 The only way in and out <br>Password:<br><input id='p'><button onclick='next()'>Enter</button>";
+stage=3.5;
+}else{
+document.getElementById("error").play();
+shake(msg);
+msg.innerHTML="❌ Wrong";
+}
+}
+
+/* Station 4 */
+function load4(){
+game.innerHTML=`
+<h2>Station 4</h2>
+<p>Identify the highlighted structure</p>
+<img src="img4.jpg">
+<br><input id="n">
+<button onclick="c4()">Submit</button>
+<p id="msg"></p>
+`;
+}
+
+function c4(){
+let msg=document.getElementById("msg");
+
+if(n.value=="7"){
+flash();
+msg.classList.add("glow");
+msg.innerHTML="🔍 Where your belongings stay locked <br>Password:<br><input id='p'><button onclick='next()'>Enter</button>";
+stage=4.5;
+}else{
+document.getElementById("error").play();
+shake(msg);
+msg.innerHTML="❌ Wrong";
+}
+}
+
+function next(){
+let p=document.getElementById("p").value.toUpperCase();
+
+if(stage==1.5 && p=="K21"){load2();}
+else if(stage==2.5 && p=="B44"){load3();}
+else if(stage==3.5 && p=="D10"){load4();}
+else if(stage==4.5 && p=="L5"){final();}
+else{document.getElementById("error").play();}
+}
+
+function final(){
+game.innerHTML=`
+<h2>FINAL CODE</h2>
+<input id="f">
+<button onclick="finish()">Submit</button>
+<p id="msg"></p>
+`;
+}
+
+function finish(){
+if(f.value=="51657"){
+document.getElementById("bg").pause();
+document.getElementById("win").play();
+
+let time=Math.floor((new Date()-startTime)/1000);
+
+msg.innerHTML="🏆 WINNER<br>"+team1.value+" & "+team2.value+"<br>Time: "+time+" sec";
+}else{
+document.getElementById("error").play();
+}
+}
+
+</script>
+</body>
+</html>
